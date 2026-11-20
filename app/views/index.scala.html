@@ -1,0 +1,53 @@
+@(seals: List[String])
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>印章图像鉴别服务</title>
+<style>
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+         max-width: 860px; margin: 24px auto; padding: 0 16px; color: #222; }
+  h1 { font-size: 24px; } h2 { font-size: 17px; margin-top: 0; }
+  .card { border: 1px solid #ddd; border-radius: 10px; padding: 16px 20px; margin: 16px 0; }
+  .btn { display: inline-block; padding: 8px 16px; margin: 4px 8px 4px 0; border-radius: 6px;
+         background: #c8102e; color: #fff; text-decoration: none; }
+  .btn.gray { background: #555; }
+  button { padding: 8px 18px; border: 0; border-radius: 6px; background: #c8102e; color: #fff; cursor: pointer; }
+  .seal-tag { display: inline-block; background: #f3f3f3; border-radius: 4px; padding: 3px 10px; margin: 2px 4px 2px 0; }
+  .muted { color: #777; font-size: 13px; }
+</style>
+</head>
+<body>
+<h1>印章图像鉴别服务</h1>
+<p class="muted">上传合同扫描件或照片，自动定位印章区域，检测复制粘贴、局部重采样、边缘融合、光照不一致等伪造迹象，并与登记印章比对形状与文字细节。</p>
+
+<div class="card">
+  <h2>上传检测</h2>
+  <form action="/analyze" method="post" enctype="multipart/form-data">
+    <input type="file" name="image" accept="image/*" required>
+    <button type="submit">开始分析</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>样例演示（程序合成）</h2>
+  <a class="btn" href="/sample/genuine">真盖章样例 → 分析</a>
+  <a class="btn" href="/sample/forged">伪造（抠图粘贴）样例 → 分析</a>
+</div>
+
+<div class="card">
+  <h2>登记印章库（@seals.size 枚）</h2>
+  @if(seals.isEmpty) { <p class="muted">尚未登记任何印章。</p> }
+  @for(s <- seals) { <span class="seal-tag">@s</span> }
+  <form action="/register" method="post" enctype="multipart/form-data" style="margin-top:12px">
+    <input type="text" name="name" placeholder="印章名称，如：云启科技合同章" required>
+    <input type="file" name="image" accept="image/*" required>
+    <button type="submit">登记</button>
+  </form>
+  <form action="/register-sample" method="post" style="margin-top:8px">
+    <button type="submit" class="btn gray" style="border:0">一键登记样例真章</button>
+  </form>
+</div>
+</body>
+</html>

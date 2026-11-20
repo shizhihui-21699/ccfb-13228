@@ -1,0 +1,4 @@
+[error] /Users/shizhihui/ccfb/runs/13228/workspace/app/services/Pipeline.scala:66:58: value reverse is not a member of object Ordering.Double
+[error]     val top2 = plain.map(_.score).sorted(Ordering.Double.reverse).take(2)
+[error]                                                          ^
+[error] one error found

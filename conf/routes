@@ -1,0 +1,8 @@
+GET     /                       controllers.SealController.index
+POST    /analyze                controllers.SealController.analyze
+GET     /report/:id             controllers.SealController.report(id: String)
+GET     /api/report/:id         controllers.SealController.reportJson(id: String)
+GET     /file/:id/:name         controllers.SealController.file(id: String, name: String)
+POST    /register               controllers.SealController.register
+POST    /register-sample        controllers.SealController.registerSample
+GET     /sample/:kind           controllers.SealController.sample(kind: String)

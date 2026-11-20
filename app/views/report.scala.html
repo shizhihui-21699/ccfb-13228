@@ -1,0 +1,69 @@
+@(r: models.Report)
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>分析报告 #@r.id</title>
+<style>
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+         max-width: 960px; margin: 24px auto; padding: 0 16px; color: #222; }
+  .banner { border-radius: 10px; padding: 14px 18px; color: #fff; margin: 14px 0; }
+  .high { background: #c8102e; } .mid { background: #d98c00; } .low { background: #2e8b57; }
+  .card { border: 1px solid #ddd; border-radius: 10px; padding: 16px 20px; margin: 16px 0; }
+  img.main { max-width: 100%; border: 1px solid #ccc; border-radius: 6px; }
+  img.diff { width: 220px; border: 1px solid #ccc; border-radius: 6px; margin: 6px 12px 6px 0; }
+  .bar-wrap { background: #eee; border-radius: 4px; height: 14px; flex: 1; margin: 0 10px; }
+  .bar { height: 14px; border-radius: 4px; background: #c8102e; }
+  .ind-row { display: flex; align-items: center; margin-top: 10px; }
+  .ind-name { width: 130px; font-weight: 600; }
+  .ind-score { width: 56px; text-align: right; font-weight: 700; }
+  .detail { color: #666; font-size: 13px; margin: 4px 0 0; }
+  table { border-collapse: collapse; } td, th { padding: 4px 12px 4px 0; text-align: left; }
+  a { color: #c8102e; }
+</style>
+</head>
+<body>
+<h1>分析报告 <small style="color:#999">#@r.id</small></h1>
+<div class="banner @(if(r.overall >= 65) "high" else if(r.overall >= 35) "mid" else "low")">
+  综合风险：@("%.0f".format(r.overall))% — @r.summary
+</div>
+
+@if(r.annotatedFile.nonEmpty) {
+<div class="card">
+  <h3>疑点区域标注</h3>
+  <img class="main" src="/file/@r.id/@r.annotatedFile" alt="标注图">
+</div>
+}
+
+@for(s <- r.seals) {
+<div class="card">
+  <h2>印章 #@{s.index + 1} — 风险 @("%.0f".format(s.suspicion))%（@s.level）</h2>
+  <p class="detail">位置：(@s.x, @s.y)，尺寸：@s.w × @s.h px</p>
+  @for(ind <- s.indicators) {
+    <div class="ind-row">
+      <span class="ind-name">@ind.label</span>
+      <div class="bar-wrap"><div class="bar" style="width:@ind.score%"></div></div>
+      <span class="ind-score">@("%.0f".format(ind.score))</span>
+    </div>
+    <p class="detail">@ind.detail</p>
+  }
+  @if(s.matches.nonEmpty) {
+    <h3>与登记印章比对</h3>
+    @for(m <- s.matches) {
+      <table>
+        <tr><th>登记章</th><td>@m.name</td></tr>
+        <tr><th>墨迹重合度 IoU</th><td>@m.iou（对齐旋转 @m.angle°）</td></tr>
+        <tr><th>形状距离（Hu 矩）</th><td>@m.shapeDist</td></tr>
+        <tr><th>结论</th><td>@m.verdict</td></tr>
+      </table>
+      <img class="diff" src="/file/@r.id/@m.diffImage" alt="差异图">
+      <p class="detail">差异图：灰=一致，红=登记章有而检材缺，蓝=检材多出</p>
+    }
+  }
+</div>
+}
+
+<p><a href="/">← 返回首页</a> ｜ <a href="/api/report/@r.id">JSON 格式报告</a></p>
+</body>
+</html>
